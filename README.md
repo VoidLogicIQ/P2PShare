@@ -1,18 +1,25 @@
 # P2P Share
 
-Browser-to-browser file transfer app using WebRTC DataChannel with 6-digit PIN pairing.
+P2P Share is a browser-to-browser file transfer app using WebRTC DataChannel and 6-digit PIN pairing.
 
-The file transfer is **P2P**.  
-The server is used only for signaling (offer/answer/ICE), implemented via HTTPS PHP API polling.
+The actual file data is transferred peer-to-peer.  
+The PHP backend is used only for signaling (`offer`, `answer`, `ice-candidate`) over HTTPS.
 
 ## Features
 
 - 6-digit PIN room pairing
-- Sender/Receiver two-card UI
-- Chunked file transfer (16 KB chunks)
-- WebRTC DataChannel file transfer (server does not store files)
-- Shared-hosting friendly signaling (`public/api.php`)
-- No database (file-based signaling state)
+- Sender and Receiver two-card UI
+- Chunked transfer (16 KB chunks)
+- WebRTC DataChannel P2P transfer
+- HTTPS signaling API with PHP (`public/api.php`)
+- No database (file-based room/signaling state)
+
+## Tech Stack
+
+- Frontend: HTML, CSS, Vanilla JavaScript
+- P2P Transport: WebRTC (`RTCPeerConnection`, `RTCDataChannel`)
+- Signaling: PHP 8+ JSON API (`fetch` polling)
+- STUN: `stun:stun.l.google.com:19302`
 
 ## Project Structure
 
@@ -33,23 +40,19 @@ The server is used only for signaling (offer/answer/ICE), implemented via HTTPS 
 ## Requirements
 
 - PHP 8+
-- HTTPS in production
 - Modern browser with WebRTC support
+- HTTPS for non-localhost usage
 
-Notes:
-- `localhost` is allowed for development.
-- Production should be opened with `https://...`.
+## HTTPS Requirement
 
-## Current Signaling Mode
+This app requires a secure context for WebRTC:
 
-Current app uses:
+- `https://...` is required for normal usage
+- `http://localhost` is allowed for local development
 
-- `public/api.php` for signaling (`create-room`, `join-room`, `send-signal`, `poll`, `leave`)
-- File-backed room state at `server/storage/rooms.json` (auto-created)
+The included `public/.htaccess` redirects HTTP to HTTPS on Apache (when rewrite is enabled).
 
-You do **not** need to run `server/signaling-server.php` for this mode.
-
-## Local Run (Quick Test)
+## Run Locally
 
 From project root:
 
@@ -63,26 +66,23 @@ Open:
 http://localhost:8000/index.html
 ```
 
-Use two tabs or two devices:
+## How to Use
 
-1. Sender: choose file, click `Generate PIN`
-2. Receiver: enter PIN, click `Connect`
-3. Receiver gets auto-download when complete
+1. Open the app on two browsers/devices.
+2. Sender:
+   - Select a file.
+   - Click `Generate PIN`.
+3. Receiver:
+   - Enter the 6-digit PIN.
+   - Click `Connect`.
+4. Transfer starts once the WebRTC DataChannel is connected.
+5. Receiver download triggers automatically when transfer completes.
 
-## Shared Hosting Deployment (Bluehost/cPanel)
+## Signaling API (Internal)
 
-1. Upload project files.
-2. Ensure this folder is web accessible:
-   - `.../P2PShare/public/`
-3. Open app from:
-   - `https://your-domain/P2PShare/public/index.html`
-4. Ensure PHP can create/write:
-   - `server/storage/rooms.json`
-   - and `server/storage/` directory
+Endpoint:
 
-## API Endpoints (internal)
-
-All requests are `POST` JSON to `public/api.php`.
+- `POST public/api.php`
 
 Actions:
 
@@ -92,33 +92,34 @@ Actions:
 - `poll`
 - `leave`
 
-## Security and Validation
+Signaling state is stored in:
 
-- PIN must be exactly 6 numeric digits
-- Peer IDs are random 32-hex tokens
-- JSON parsing and action validation
-- File transfer stays peer-to-peer over DataChannel
-- Stale peer/room cleanup in signaling storage
+- `server/storage/rooms.json` (created automatically)
+
+## Notes
+
+- `server/signaling-server.php` is the legacy WebSocket signaling server and is not required for the current HTTPS signaling mode.
+- Server never stores transferred file data.
 
 ## Troubleshooting
 
-### Error: `Could not connect to ws://localhost:8080`
+### Still seeing `ws://localhost:8080` error
 
-You are running an old `app.js`.  
-Verify deployed `app.js` starts with:
+You are running an old `public/app.js`.  
+The current file starts with:
 
 ```js
 const SIGNALING_ENDPOINT = "api.php";
 ```
 
-If it contains `SIGNALING_URL` or `ws://localhost:8080`, replace it with the latest file and hard refresh (`Ctrl+F5`).
+Hard refresh after deploying (`Ctrl+F5`).
 
 ### `api.php` returns 405 in browser
 
-Normal. `api.php` only accepts `POST` JSON from the app.
+Expected behavior. `api.php` only accepts `POST` requests.
 
-### Peers fail to connect
+### Connection fails between peers
 
-- Verify both users are on HTTPS
-- Check browser console for ICE errors
-- Some strict NAT networks may need a TURN server (current config uses public STUN)
+- Ensure both peers open the app over HTTPS (or localhost for local testing).
+- Check browser console for ICE/WebRTC errors.
+- Some strict NAT environments may require a TURN server.
