@@ -13,6 +13,7 @@ The PHP backend is used only for signaling (`offer`, `answer`, `ice-candidate`) 
 - WebRTC DataChannel P2P transfer
 - HTTPS signaling API with PHP (`public/api.php`)
 - No database (file-based room/signaling state)
+- Installable PWA (Chrome/Edge)
 
 ## Tech Stack
 
@@ -51,6 +52,23 @@ This app requires a secure context for WebRTC:
 - `http://localhost` is allowed for local development
 
 The included `public/.htaccess` redirects HTTP to HTTPS on Apache (when rewrite is enabled).
+
+## Install as App (PWA)
+
+On Chrome/Edge (desktop or Android):
+
+1. Open the app over `https://`.
+2. Wait a few seconds for service worker and manifest to load.
+3. Use browser menu:
+   - Android Chrome: `Add to Home screen` / `Install app`
+   - Desktop Chrome: `Install P2P Share` in address bar or menu
+
+PWA files:
+
+- `public/manifest.webmanifest`
+- `public/sw.js`
+- `public/icons/icon-192.png`
+- `public/icons/icon-512.png`
 
 ## Run Locally
 

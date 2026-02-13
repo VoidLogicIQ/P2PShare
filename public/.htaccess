@@ -4,3 +4,7 @@ RewriteCond %{HTTPS} !=on
 RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 </IfModule>
+
+<IfModule mod_mime.c>
+AddType application/manifest+json .webmanifest
+</IfModule>

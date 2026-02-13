@@ -788,3 +788,9 @@ function setStatus(element, text, isError = false, isSuccess = false) {
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+if ("serviceWorker" in navigator && isHttpsAllowed()) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
+}
