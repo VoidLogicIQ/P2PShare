@@ -1,0 +1,11 @@
+{
+  "name": "p2pshare/webrtc-file-share-signaling",
+  "description": "WebRTC P2P file sharing signaling server using Ratchet and ReactPHP",
+  "type": "project",
+  "require": {
+    "php": ">=8.0",
+    "cboden/ratchet": "^0.4"
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}

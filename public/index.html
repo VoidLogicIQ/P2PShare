@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P2P Share</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>P2P Share File Transfer</h1>
+      <p class="subtitle">Direct browser-to-browser transfer with 6-digit PIN pairing over HTTPS signaling.</p>
+
+      <section class="cards">
+        <article class="card">
+          <h2>Sender</h2>
+          <label class="field-label" for="sender-file">Choose file</label>
+          <input id="sender-file" type="file" />
+          <button id="generate-pin-btn" type="button">Generate PIN</button>
+          <div class="pin-wrap">
+            <span class="pin-label">Pairing PIN</span>
+            <div id="sender-pin" class="pin-value">------</div>
+          </div>
+          <p id="sender-status" class="status">Idle</p>
+        </article>
+
+        <article class="card">
+          <h2>Receiver</h2>
+          <label class="field-label" for="receiver-pin-input">Enter 6-digit PIN</label>
+          <input
+            id="receiver-pin-input"
+            type="text"
+            inputmode="numeric"
+            maxlength="6"
+            placeholder="123456"
+          />
+          <button id="connect-pin-btn" type="button">Connect</button>
+          <div class="progress-wrap">
+            <progress id="download-progress" value="0" max="100"></progress>
+            <span id="download-percent">0%</span>
+          </div>
+          <p id="receiver-status" class="status">Idle</p>
+        </article>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
